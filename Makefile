@@ -7,7 +7,7 @@ AR=${ARCH}-ar
 INCLUDEDIR=./include/
 
 
-CFLAGS:=$(CFLAGS) -ffreestanding -Wall -Wextra  -g -m32 -I$(INCLUDEDIR)
+CFLAGS:=$(CFLAGS) -O0 -ffreestanding -Wall -Wextra  -g -m32 -I$(INCLUDEDIR)
 LDFLAGS:=$(LDFLAGS)
 LIBS:=$(LIBS) -nostdlib -lk -lgcc
 
@@ -39,5 +39,9 @@ kernel:
 libs:
 	cp tty.h $(INCLUDEDIR)
 	$(CC) $(CFLAGS) -c -D_STATIC_LIB=1 tty.c -o tty.o
+	objcopy tty.o dbg/tty.debug
 	$(AR) r libtty.a tty.o
 	ranlib libtty.a
+
+clean:
+	rm *.o *.bin dbg/* include/* *.a

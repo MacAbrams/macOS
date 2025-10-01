@@ -2,7 +2,7 @@
 [ORG 0x7c00]
 
 KernelLocation equ 0x1000
-NUM_SECTORS equ 1
+NUM_SECTORS equ 5
 
 start:
 	cli
@@ -14,10 +14,6 @@ start:
 	mov sp, 0x7c00
 	mov bp, sp
 	sti
-	mov ah, 0x0b
-	mov bh, 0
-	mov bl, 1
-	int 0x10
 load:
 	mov dl, [diskname]
 	mov ch, 0
