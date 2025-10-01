@@ -2,3 +2,7 @@
 *.o
 *.bin
 *.swp
+*.a
+*.gch
+dbg/
+include/

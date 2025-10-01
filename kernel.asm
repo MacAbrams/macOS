@@ -1,5 +1,9 @@
 global _start
 _start:
-	mov byte [0xb8000],'E'
+	push ebp
+	mov ebp, esp
+
 	[extern main]
 	call main
+	mov esp, ebp
+	pop ebp

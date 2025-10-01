@@ -2,7 +2,7 @@
 [ORG 0x7c00]
 
 KernelLocation equ 0x1000
-NUM_SECTORS equ 5
+NUM_SECTORS equ 1
 
 start:
 	cli
@@ -27,12 +27,15 @@ load:
 	mov bx, KernelLocation
 	mov ah, 2
 	int 0x13
-	jc .error
-	cmp al, 5
-	jne .error
+
+	lea si, [fileError]
+	jc error
+	lea si, [msg2]
+	cmp al, NUM_SECTORS
+	jne error
 	jmp enter_protected
-	.error:
-	lea si, [fileReadError]
+msg2: db "Wrong number of sectors read",0xd,0xa,0
+	error:
 	.l1:
 		lodsb
 		cmp al, 0
@@ -50,6 +53,10 @@ enter_protected:
 	mov eax, cr0
 	or eax, 1
 	mov cr0, eax
+	mov eax, cr0
+	bt eax, 0
+	lea si, [protectedError]
+	jnc error
 	jmp CODESEG:start_protected_mode
 GDT_start:
 	null_descriptor:
@@ -86,6 +93,7 @@ start_protected_mode:
 	mov gs, ax
 	mov ebp, 0x90000
 	mov esp, ebp
+	mov byte [0xb8000],"A"
 	jmp KernelLocation
 
 	cli
@@ -94,7 +102,8 @@ start_protected_mode:
 	
 diskname: dd 0
 msg: db "test",0xd,0xa,0
-fileReadError: db "file read error",0xd,0xa,0
+fileError: db "file error",0xd,0xa,0
+protectedError: db "prot error",0xd,0xa,0
 
 times 510 - ($ -$$) db 0
 dw 0xAA55
