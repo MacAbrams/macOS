@@ -9,7 +9,7 @@ INCLUDEDIR=../include
 LIBINCLUDEDIR=$(LIBDIR)/include
 
 
-CFLAGS:=$(CFLAGS) -O0 -ffreestanding -Wall -Wextra  -g -m32 -I../include -Iinclude
+CFLAGS:=$(CFLAGS) -O0 -ffreestanding -Wall -Wextra  -g -m32 -I../kernel/include -Iinclude
 LDFLAGS:=$(LDFLAGS)
 LIBS:=$(LIBS) -nostdlib -lk -lgcc
 
@@ -19,6 +19,9 @@ string/memcmp.o \
 string/memcpy.o \
 string/memset.o \
 string/memmove.o \
+stdio/putchar.o \
+stdio/puts.o \
+stdio/printf.o \
 
 LIBK_OBJS=$(FREEOBJS:.o=.libk.o)
 

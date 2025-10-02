@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <tty.h>
+#include <kernel/tty.h>
 #include "vga.h"
 
 extern void outb(uint8_t value, uint16_t port);
@@ -41,6 +41,14 @@ void terminal_setcolor(uint8_t c){
 	terminal_color = c;
 }
 
+void terminal_setcolumn(int x){
+	terminal_column = x;
+}
+
+void terminal_setrow(int y){
+	terminal_row = y;
+}
+
 void terminal_putentryat(unsigned char c, uint8_t col, size_t x, size_t y){
 	terminal_buffer[x + y * VGA_WIDTH] = vga_entry(c,col);
 }
@@ -57,6 +65,30 @@ void terminal_scroll(int line){
 void terminal_delete_last_line(){
 	for(size_t i = 0; i < VGA_WIDTH; ++i){
 		terminal_buffer[i]=vga_entry(' ',terminal_color);
+	}
+}
+
+void terminal_newline(){
+	if(++terminal_row == VGA_HEIGHT){
+		for(size_t line = 1; line <=VGA_HEIGHT-1; ++line){
+			terminal_scroll(line);
+		}
+		terminal_delete_last_line();
+		terminal_row = VGA_HEIGHT-1;
+	}
+}
+
+void terminal_tab(){
+	terminal_column=(terminal_column+4)&(~0x3);
+	if(terminal_column == VGA_WIDTH){
+		terminal_column = 0;
+		if(++terminal_row == VGA_HEIGHT){
+			for(size_t line = 1; line <=VGA_HEIGHT-1; ++line){
+				terminal_scroll(line);
+			}
+			terminal_delete_last_line();
+			terminal_row = VGA_HEIGHT-1;
+		}
 	}
 }
 

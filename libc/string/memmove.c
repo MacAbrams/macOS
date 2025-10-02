@@ -7,8 +7,8 @@ void* memmove(void* dst, const void* src, size_t size){
 		}
 	}
 	else{
-		for(size_t i=size; i>=0; --i){
-			((char*)dst)[i]=((char*)src)[i];
+		for(size_t i=size; i>0; --i){
+			((char*)dst)[i-1]=((char*)src)[i-1];
 		}
 	}
 	return dst;

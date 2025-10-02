@@ -1,16 +1,14 @@
 #include <stdint.h>
-#include <tty.h>
+#include <kernel/tty.h>
 #include "vga.h"
 #include <string.h>
+#include <stdio.h>
 
 
 int main(void){
 	terminal_initialize();
-	terminal_putchar('a');
-	terminal_putchar(0xa);
-	char* s = "test\nnow";
+	printf("test %% %c\n",'a');
 
-	terminal_write(s,strlen(s));
 	while(1){
 	
 	}

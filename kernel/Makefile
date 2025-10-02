@@ -28,6 +28,7 @@ kernel:
 #	$(CC) $(CFLAGS) -o $@ $(LINK_LIST)
 	$(CC) $(CFLAGS) -c kernel.c -o kernel.c.o
 	$(LD) $(LDFLAGS) -Ttext 0x1000 kernel.asm.o kernel.c.o tty.o $(LIBDIR)/libk.a --oformat binary -g -o kernel.bin
+	$(LD) $(LDFLAGS) -Ttext 0x1000 kernel.asm.o kernel.c.o tty.o $(LIBDIR)/libk.a  -g -o $(DEBUG)/kernel.debug
 	cat "boot.bin" "kernel.bin" "zero"> everything.bin
 	objcopy kernel.asm.o $(DEBUG)/kernel.asm.debug
 	objcopy kernel.c.o $(DEBUG)/kernel.c.debug
