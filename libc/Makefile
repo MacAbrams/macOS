@@ -9,12 +9,16 @@ INCLUDEDIR=../include
 LIBINCLUDEDIR=$(LIBDIR)/include
 
 
-CFLAGS:=$(CFLAGS) -O0 -ffreestanding -Wall -Wextra  -g -m32 -I$(INCLUDEDIR) -I$(LIBINCLUDEDIR)
+CFLAGS:=$(CFLAGS) -O0 -ffreestanding -Wall -Wextra  -g -m32 -I../include -Iinclude
 LDFLAGS:=$(LDFLAGS)
 LIBS:=$(LIBS) -nostdlib -lk -lgcc
 
 FREEOBJS=\
 string/strlen.o \
+string/memcmp.o \
+string/memcpy.o \
+string/memset.o \
+string/memmove.o \
 
 LIBK_OBJS=$(FREEOBJS:.o=.libk.o)
 
