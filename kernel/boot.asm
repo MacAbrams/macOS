@@ -2,7 +2,7 @@
 [ORG 0x7c00]
 
 KernelLocation equ 0x1000
-NUM_SECTORS equ 5
+NUM_SECTORS equ 29
 
 start:
 	cli

@@ -50,21 +50,30 @@ void terminal_setrow(int y){
 }
 
 void terminal_putentryat(unsigned char c, uint8_t col, size_t x, size_t y){
-	terminal_buffer[x + y * VGA_WIDTH] = vga_entry(c,col);
+	unsigned int a = x + y * VGA_WIDTH;
+	if(a<VGA_HEIGHT*VGA_WIDTH){
+		terminal_buffer[x + y * VGA_WIDTH] = vga_entry(c,col);
+	}
 }
 
 void terminal_scroll(int line){
 	char c;
 
-	for(size_t loop = line * (VGA_WIDTH * 2) + 0xb8000; loop < VGA_WIDTH * 2; ++loop){
-		c = *(uint16_t*)loop;
-		*(uint16_t*)(loop - (VGA_WIDTH)) = c;
+//	for(size_t loop = line * (VGA_WIDTH * 2) + 0xb8000; loop < VGA_WIDTH * 2; ++loop){
+//		c = *(uint16_t*)loop;
+//		*(uint16_t*)(loop - (VGA_WIDTH)) = c;
+//	}
+	if((unsigned int)line < VGA_HEIGHT && line!=0){
+	for(size_t i = 0; i<VGA_WIDTH*2;++i){
+		c = *(uint16_t*)((uint32_t)0xb8000+2*VGA_WIDTH*line+i);
+		*(uint16_t*)((uint32_t)0xb8000+2*VGA_WIDTH*(line-1)+i) = c;
+	}
 	}
 }
 
 void terminal_delete_last_line(){
 	for(size_t i = 0; i < VGA_WIDTH; ++i){
-		terminal_buffer[i]=vga_entry(' ',terminal_color);
+		terminal_buffer[VGA_WIDTH*(VGA_HEIGHT-1)+i]=vga_entry(' ',terminal_color);
 	}
 }
 
@@ -93,17 +102,31 @@ void terminal_tab(){
 }
 
 void terminal_putchar(char c){
-	terminal_putentryat(c,terminal_color,terminal_column, terminal_row);
-	if(++terminal_column == VGA_WIDTH){
-		terminal_column = 0;
-		if(++terminal_row == VGA_HEIGHT){
-			for(size_t line = 1; line <=VGA_HEIGHT-1; ++line){
-				terminal_scroll(line);
+	switch(c){
+		case(0x9):
+			terminal_tab();
+			break;
+		case(0xa):
+			terminal_newline();
+			terminal_setcolumn(0);
+			break;
+		default:
+			terminal_putentryat(c,terminal_color,terminal_column, terminal_row);
+			if(++terminal_column == VGA_WIDTH){
+				terminal_column = 0;
+				if(++terminal_row == VGA_HEIGHT){
+					for(size_t line = 1; line <=VGA_HEIGHT-1; ++line){
+						terminal_scroll(line);
+					}
+					terminal_delete_last_line();
+					terminal_row = VGA_HEIGHT-1;
+				}
 			}
-			terminal_delete_last_line();
-			terminal_row = VGA_HEIGHT-1;
-		}
+
+			break;
 	}
+	terminal_setcursor(terminal_column,terminal_row);
+
 }
 void terminal_write(const char* data, size_t size){
 	for(size_t i = 0; i<size; ++i){

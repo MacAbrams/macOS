@@ -27,8 +27,12 @@ kernel:
 	nasm -felf kernel.asm -o kernel.asm.o
 #	$(CC) $(CFLAGS) -o $@ $(LINK_LIST)
 	$(CC) $(CFLAGS) -c kernel.c -o kernel.c.o
-	$(LD) $(LDFLAGS) -Ttext 0x1000 kernel.asm.o kernel.c.o tty.o $(LIBDIR)/libk.a --oformat binary -g -o kernel.bin
-	$(LD) $(LDFLAGS) -Ttext 0x1000 kernel.asm.o kernel.c.o tty.o $(LIBDIR)/libk.a  -g -o $(DEBUG)/kernel.debug
+	nasm -felf gdt.asm -o gdt.asm.o
+	nasm -felf idt.asm -o idt.asm.o
+	$(CC) $(CFLAGS) -c gdt.c -o gdt.c.o
+	$(CC) $(CFLAGS) -c idt.c -o idt.c.o
+	$(LD) $(LDFLAGS) -Ttext 0x1000 kernel.asm.o kernel.c.o tty.o gdt.c.o gdt.asm.o idt.c.o idt.asm.o $(LIBDIR)/libk.a --oformat binary -g -o kernel.bin
+	$(LD) $(LDFLAGS) -Ttext 0x1000 kernel.asm.o kernel.c.o tty.o gdt.c.o gdt.asm.o idt.c.o idt.asm.o $(LIBDIR)/libk.a  -g -o $(DEBUG)/kernel.debug
 	cat "boot.bin" "kernel.bin" "zero"> everything.bin
 	objcopy kernel.asm.o $(DEBUG)/kernel.asm.debug
 	objcopy kernel.c.o $(DEBUG)/kernel.c.debug

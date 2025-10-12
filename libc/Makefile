@@ -22,6 +22,7 @@ string/memmove.o \
 stdio/putchar.o \
 stdio/puts.o \
 stdio/printf.o \
+stdlib/abort.o \
 
 LIBK_OBJS=$(FREEOBJS:.o=.libk.o)
 
