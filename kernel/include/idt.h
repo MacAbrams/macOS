@@ -82,5 +82,7 @@ extern void isr128();
 extern void isr177();
 
 
+void irq_install_handler(int irq, void (*handler)(struct InterruptRegisters *r));
+void irq_uninstall_handler(int irq);
 
 #endif

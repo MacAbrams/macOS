@@ -5,7 +5,7 @@
 #include <kernel/tty.h>
 #include "vga.h"
 
-extern void outb(uint8_t value, uint16_t port);
+extern void outb(int port, int data);
 
 
 static const size_t VGA_WIDTH = 80;
@@ -20,10 +20,10 @@ static uint16_t* terminal_buffer;
 void terminal_setcursor(size_t x, size_t y){
 	size_t i = x + y * VGA_WIDTH;
 
-	outb(0xf,0x3d4);	
-	outb(i&0xff,0x3d5);	
-	outb(0xe,0x3d4);	
-	outb((i>>8)&0xff,0x3d5);	
+	outb(0x3d4, 0xf);
+	outb(0x3d5, i&0xff);
+	outb(0x3d4, 0xe);
+	outb(0x3d5, (i>>8)&0xff);
 }
 
 void terminal_initialize(void){

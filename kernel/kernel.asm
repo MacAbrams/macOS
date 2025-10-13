@@ -10,9 +10,16 @@ _start:
 global outb
 outb:
 	push edx
-	mov ax, [esp + 0x8]
-	mov dx, [esp + 12]
+	mov dx, [esp + 0x8]
+	mov ax, [esp + 12]
 	out dx, al
 	pop edx
-	mov eax, 0
+	ret
+global inb
+; inb(port)
+inb:
+	push edx
+	mov dx, [esp + 0x8]
+	in al, dx
+	pop edx
 	ret
