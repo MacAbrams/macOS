@@ -114,6 +114,9 @@ int printf(const char * s, ...){
 					break;	
 			}
 			++i;
+			if(s[i]==0){
+				return 0;
+			}
 
 		}
 		putchar(s[i]);

@@ -20,6 +20,7 @@ idt.c.o \
 timer.c.o \
 gdt.asm.o \
 idt.asm.o \
+keys.c.o \
 
 .PHONY: all
 .SUFFIXES: .o .libk.o .c .S
@@ -42,8 +43,9 @@ kernel:
 #	$(CC) $(CFLAGS) -c gdt.c -o gdt.c.o
 #	$(CC) $(CFLAGS) -c idt.c -o idt.c.o
 #	$(CC) $(CFLAGS) -c timer.c -o timer.c.o
-	$(LD) $(LDFLAGS) -Ttext 0x1000 kernel.asm.o kernel.c.o tty.o $(ARCHOBJS1) $(LIBDIR)/libk.a --oformat binary -g -o kernel.bin
-	$(LD) $(LDFLAGS) -Ttext 0x1000 kernel.asm.o kernel.c.o tty.o $(ARCHOBJS1) $(LIBDIR)/libk.a  -g -o $(DEBUG)/kernel.debug
+	$(LD) $(LDFLAGS) -T linker.ld kernel.asm.o kernel.c.o tty.o $(ARCHOBJS1) $(LIBDIR)/libk.a --oformat binary -g -o kernel.bin
+	$(LD) $(LDFLAGS) -T linker.ld kernel.asm.o kernel.c.o tty.o $(ARCHOBJS1) $(LIBDIR)/libk.a  -g -o $(DEBUG)/kernel.debug
+
 	#$(LD) $(LDFLAGS) -Ttext 0x1000 kernel.asm.o kernel.c.o tty.o gdt.c.o gdt.asm.o idt.c.o idt.asm.o timer.c.o $(LIBDIR)/libk.a --oformat binary -g -o kernel.bin
 	cat "boot.bin" "kernel.bin" "zero"> everything.bin
 	objcopy kernel.asm.o $(DEBUG)/kernel.asm.debug

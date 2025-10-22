@@ -2,7 +2,7 @@
 [ORG 0x7c00]
 
 KernelLocation equ 0x1000
-NUM_SECTORS equ 18
+NUM_SECTORS equ 16 
 
 start:
 	cli
@@ -14,7 +14,58 @@ start:
 	mov sp, 0x7c00
 	mov bp, sp
 	sti
+testMem:
+	mmap_ent equ 0x8000
+	do_e820:
+		mov di, 0x8004
+		xor ebx, ebx
+		xor bp, bp
+		mov edx, 0x534d4150
+		mov eax, 0xe820
+		mov [es:di + 20], dword 1
+		mov ecx, 24
+		int 0x15
+		;if carry call unsuported	
+		jc .failed
+		mov edx, 0x534d4150
+		cmp eax, edx
+		jne .failed
+		test ebx, ebx ;ebx 0 means 1 entry which is bad
+		je .failed
+		jmp .jmpin
+.e820lp:
+	mov eax, 0xe820
+	mov [es:di + 20], dword 1
+	mov ecx, 24
+	int 0x15
+	jc .e820f
+	mov edx, 0x534d4150
+.jmpin:
+	jcxz .skipent ; 0 len entries
+	cmp cl, 20 ; dunno
+	jbe .notext
+	test byte [es:di + 20],1 ;ignore data bit
+	je .skipent
+.notext:
+	mov ecx, [es:di +8]
+	or ecx, [es:di + 12]
+	jz .skipent ;zero length
+	inc bp ;good entry
+	add di, 24
+.skipent:
+	test ebx, ebx ; if its 0 we done
+	jne .e820lp
+.e820f:
+	mov [es:mmap_ent], bp ;store the count
+	jmp load
+
+.failed
+	lea si, [bios]
+	jmp error
+
 load:
+	mov sp, 0x7c00
+	mov bp, sp
 	mov dl, [diskname]
 	mov ch, 0
 	mov dh, 0
@@ -31,6 +82,7 @@ load:
 	jne error
 	jmp enter_protected
 msg2: db "Wrong number of sectors read",0xd,0xa,0
+bios: db "Unable to get Memory map",0xa,0xd,"int 0x15; ax=0xe820 unsuported",0xd,0xa,0
 	error:
 	.l1:
 		lodsb
