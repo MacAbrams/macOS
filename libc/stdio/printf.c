@@ -14,21 +14,24 @@ int printf(const char * s, ...){
 			++i;
 			unsigned char length = sizeof(int);
 			char* a;
+label:
 			switch(s[i]){
 				case('h'):
 					length = sizeof(short);
-					if(s[i]=='h'){
+					if(s[i+1]=='h'){
 						length = sizeof(char);
 						++i;
 					}
-					continue;
+					++i;
+					goto label;
 				case('l'):
 					length = sizeof(long);
-					if(s[i]=='l'){
+					if(s[i+1]=='l'){
 						length = sizeof(long long);
 						++i;
 					}
-					continue;
+					++i;
+					goto label;
 				case('J'):
 					length = sizeof(uintmax_t);
 					continue;

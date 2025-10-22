@@ -1,18 +1,8 @@
 section .boot
 global _start
 _start:
-	
-	mov eax, 0x0
-	mov ebx, 0x1000
-	.fill_table:
-		mov ecx, ebx
-		or ecx, 3
-		mov [initial_page_dir+eax*4],ecx
-		add ebx, 4096
-		inc eax
-		cmp eax, 1024
-		jne .fill_table
-	.done:
+	mov  byte [0xb8000], 'B'
+	push ebx
 	jmp higher_half
 		
 	mov eax, (initial_page_dir - 0xc0000000)
@@ -22,9 +12,8 @@ _start:
 	mov cr4, ecx
 
 	mov ecx, cr0
-	or ecx, 0x80000000 ;enable paging
+	or ecx, 0x80000001 ;enable paging
 	mov cr0, ecx
-	mov ecx, cr0
 	jmp higher_half
 
 
@@ -69,15 +58,21 @@ stack_top:
 
 
 section .data
-align 4096
 global initial_page_dir
 initial_page_dir: 
  ;PavlGpDappurp
-	dd 0x100003
+	dd 10000011b ; identity page
 	times 768-1 dd 0
 	;kernel
-	dd (0 << 22) | 0x100003
-	dd (1 << 22) | 0x100003
-	dd (2 << 22) | 0x100003
-	dd (3 << 22) | 0x100003
+	dd (kernel_page_table) + 00000011b
+	dd (1 << 22) | 10000011b
+	dd (2 << 22) | 10000011b
+	dd (3 << 22) | 10000011b
 	times 256-4 dd 0
+
+kernel_page_table:
+;      avlgpdapprp 
+	dd (1 << 12) | 00000000011b
+	dd (2 << 12) | 00000000011b
+	dd (3 << 12) | 00000000011b
+	times 1024-3 dd 0

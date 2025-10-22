@@ -24,7 +24,7 @@ SECTIONS
 		*(COMMON)
 		*(.bss)
 	}
-	.data : AT(ADDR(.data)){
+	.data ALIGN(4096): AT(ADDR(.data)){
 		*(.data)
 	}
 

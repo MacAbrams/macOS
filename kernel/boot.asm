@@ -2,7 +2,7 @@
 [ORG 0x7c00]
 
 KernelLocation equ 0x1000
-NUM_SECTORS equ 16 
+NUM_SECTORS equ 16
 
 start:
 	cli
@@ -73,6 +73,7 @@ load:
 	mov al, NUM_SECTORS
 	mov bx, KernelLocation
 	mov ah, 2
+	clc
 	int 0x13
 
 	lea si, [fileError]
@@ -81,6 +82,7 @@ load:
 	cmp al, NUM_SECTORS
 	jne error
 	jmp enter_protected
+fileError: db "file error",0xd,0xa,0
 msg2: db "Wrong number of sectors read",0xd,0xa,0
 bios: db "Unable to get Memory map",0xa,0xd,"int 0x15; ax=0xe820 unsuported",0xd,0xa,0
 	error:
@@ -142,6 +144,7 @@ start_protected_mode:
 	mov ebp, 0x90000
 	mov esp, ebp
 	mov byte [0xb8000],"A"
+	lea ebx, [mmap_ent]
 	jmp KernelLocation
 
 	cli
@@ -150,7 +153,6 @@ start_protected_mode:
 	
 diskname: dd 0
 msg: db "test",0xd,0xa,0
-fileError: db "file error",0xd,0xa,0
 protectedError: db "prot error",0xd,0xa,0
 
 times 510 - ($ -$$) db 0
