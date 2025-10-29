@@ -46,7 +46,7 @@ kernel:
 	$(LD) $(LDFLAGS) -T linker.ld kernel.asm.o kernel.c.o tty.o $(ARCHOBJS1) $(LIBDIR)/libk.a --oformat binary -g -o kernel.bin
 	$(LD) $(LDFLAGS) -T linker.ld kernel.asm.o kernel.c.o tty.o $(ARCHOBJS1) $(LIBDIR)/libk.a  -g -o $(DEBUG)/kernel.debug
 	#$(LD) $(LDFLAGS) -Ttext 0x1000 kernel.asm.o kernel.c.o tty.o gdt.c.o gdt.asm.o idt.c.o idt.asm.o timer.c.o $(LIBDIR)/libk.a --oformat binary -g -o kernel.bin
-	cat "boot.bin" "kernel.bin" "zero"> everything.bin
+	cat "boot.bin" "kernel.bin" "checkFile" "zero"> everything.bin
 	objcopy kernel.asm.o $(DEBUG)/kernel.asm.debug
 	objcopy kernel.c.o $(DEBUG)/kernel.c.debug
 arch:

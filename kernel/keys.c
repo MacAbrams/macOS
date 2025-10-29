@@ -13,6 +13,7 @@ void initKeys(){
 	irq_install_handler(1,keyPressHandler);
 }
 
+void escaped(uint8_t scan2);
 void keyPressHandler(struct InterruptRegisters* regs){
 	uint8_t scan = inb(0x60);
 	//scan+=0x65-0x1e;
@@ -52,6 +53,7 @@ void keyPressHandler(struct InterruptRegisters* regs){
 			outb(0x20,0x20);
 			uint8_t scan2 = inb(0x60);
 			printf("e0:%x",scan2);
+			escaped(scan2);
 			break;
 		case(KEY_L_SHIFT_RELEASED):
 		case(KEY_R_SHIFT_RELEASED):
@@ -81,4 +83,12 @@ void keyPressHandler(struct InterruptRegisters* regs){
 	}
 
 	outb(0x20,0x20);
+}
+
+void escaped(uint8_t scan2){
+	switch(scan2){
+		case(KEY_UP_ARROW_PRESSED):
+
+			break;
+	}	
 }

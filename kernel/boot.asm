@@ -2,17 +2,19 @@
 [ORG 0x7c00]
 
 KernelLocation equ 0x1000
-NUM_SECTORS equ 16
+extern _kernel_end;
+extern _kernel_sectors;
+NUM_SECTORS equ 17
 
 start:
 	cli
-	mov [diskname], dl
 	mov ax, 0x0
 	mov ds, ax
 	mov es, ax
 	mov ss, ax
 	mov sp, 0x7c00
 	mov bp, sp
+	mov [diskname], dl
 	sti
 testMem:
 	mmap_ent equ 0x8000
@@ -59,33 +61,45 @@ testMem:
 	mov [es:mmap_ent], bp ;store the count
 	jmp load
 
-.failed
+.failed:
 	lea si, [bios]
 	jmp error
+jmp load
 
 load:
-	mov sp, 0x7c00
-	mov bp, sp
-	mov dl, [diskname]
-	mov ch, 0
-	mov dh, 0
-	mov cl, 2
-	mov al, NUM_SECTORS
-	mov bx, KernelLocation
-	mov ah, 2
-	clc
-	int 0x13
 
+.l:
+	mov dl, [diskname]
+	mov ch, 0 ;c
+	mov dh, 0 ;h
+	mov cl, 2 ;s
+	mov al, NUM_SECTORS ;num
+	mov ah, 2
+	mov bx, KernelLocation
+	int 0x13
+	jnc .ne
+
+	mov ah, 0
+	mov dl, [diskname]
+	int 0x13
+	mov cl, [var]
+	add byte [var],1
+	cmp cl, 3
+	jna .l
 	lea si, [fileError]
 	jc error
+	.ne:
+
 	lea si, [msg2]
-	cmp al, NUM_SECTORS
+	cmp ah,0 
 	jne error
 	jmp enter_protected
-fileError: db "file error",0xd,0xa,0
+	
+fileError: db "file read error",0xd,0xa,0
 msg2: db "Wrong number of sectors read",0xd,0xa,0
 bios: db "Unable to get Memory map",0xa,0xd,"int 0x15; ax=0xe820 unsuported",0xd,0xa,0
-	error:
+var: db 0
+error:
 	.l1:
 		lodsb
 		cmp al, 0

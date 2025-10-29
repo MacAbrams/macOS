@@ -1,5 +1,4 @@
 global gdt_flush
-
 gdt_flush:
 	mov eax, [esp+4] ; get first arg
 	lgdt [eax]
