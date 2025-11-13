@@ -17,9 +17,9 @@ start:
 	mov [diskname], dl
 	sti
 testMem:
-	mmap_ent equ 0x8000
+	mmap_ent equ 0x7e00
 	do_e820:
-		mov di, 0x8004
+		mov di, mmap_ent+4
 		xor ebx, ebx
 		xor bp, bp
 		mov edx, 0x534d4150
@@ -54,6 +54,8 @@ testMem:
 	jz .skipent ;zero length
 	inc bp ;good entry
 	add di, 24
+	cmp di, 0xffff
+	jae .outOfBounds
 .skipent:
 	test ebx, ebx ; if its 0 we done
 	jne .e820lp
@@ -64,8 +66,12 @@ testMem:
 .failed:
 	lea si, [bios]
 	jmp error
+.outOfBounds
+	lea si, [memmapTooBig]
+	jmp error
 jmp load
 
+memmapTooBig: db "Memory Map too big",0xa,0xd,0x0
 load:
 
 .l:
@@ -155,7 +161,7 @@ start_protected_mode:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
-	mov ebp, 0x90000
+	mov ebp, 0x8fff ; bottom of mmap 0x9000-1
 	mov esp, ebp
 	mov byte [0xb8000],"A"
 	lea ebx, [mmap_ent]

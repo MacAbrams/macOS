@@ -7,6 +7,57 @@
 #include <timer.h>
 #include <keys.h>
 #include <mem.h>
+/*
+ * current Memory
+ * 0x00000
+ * IVT
+ * 0x00400
+ * BDA
+ * 0x00500
+ * possible stage 2??
+ * 0x01000
+ * _start
+ * os
+ * ||
+ * \/
+ *
+ * 0x07c00
+ * boot
+ * 0x07e00
+ * mmap
+ * || 
+ * \/
+ *
+ * /\
+ * ||
+ * stack
+ * 0x9000
+ * Page Dir
+ * 0xA000
+ * Page Table table
+ * 0xB000
+ * TBD (4 kiB)
+ * ||
+ * \/
+ * 
+ * 0x80000
+ * EBDA (uint16_t size = *0x413)
+ * ||
+ * \/
+ *
+ * /\
+ * ||
+ * stack
+ * 0xA0000
+ * ISA Hole
+ * 0x100000
+ * 1MiB
+ *
+ * end ID Map 4MiB boundry
+ * 0x3FFFFF
+ *
+ */
+
 
 extern uint8_t inb(int port);
 extern int outb(int port,int data);
@@ -35,35 +86,29 @@ void keyPress(struct InterruptRegisters* regs){
 int main(uint32_t *memInfo){
 	//detect memory
 	terminal_initialize();
-	printf("test1\n");
+	printf("Boot succesful\n");
 	initGdt();
 	initIdt();
 	initTimer();
 //	irq_install_handler(0,testFunc);
-	//initKeys();
-	irq_install_handler(1,keyPress);
-	
-	printf("%p\n",memInfo);
-	uint32_t num = *(memInfo);
-	struct physical_memory_table_entry* entries = (struct physical_memory_table_entry*)(&memInfo[1]);
-	printf("%x:\n",num);
-	condenseMemmap(&num, entries);
-	dummy();
-	for(size_t i=0;i<num; ++i){
-		*waitFlag = 0;
-		printf("Base: %llx  L: %llx R: %x A: %x\n",entries[i].base,entries[i].length,entries[i].region,entries[i].ACPI);
-		while(1){
-			if(*waitFlag ==1){
-				break;
-			}
+	initKeys();
+
+	uint32_t num = *memInfo;
+	struct physical_memory_table_entry* entries = (struct physical_memory_table_entry*)(&memInfo[1]);	
+	printf("%x\n",num);
+	for(size_t i=0; i<(size_t)num;++i){
+		struct physical_memory_table_entry e = entries[i]; 
+		if(e.region ==1){
+			printf("%llx, %llx, %lx\n",e.base,e.length,e.region);
 		}
+		uint32_t start = e.base;
+		uint32_t end = e.base+e.length;
+
 	}
 
 
-	//uint32_t end = (uint32_t)_kernel_end;
+
 	
-	//printf("%p: %x\n",&_kernel_end,end);
-	printf("%x\n",*((uint32_t*)0x4070));
 	while(1){
 		asm("nop");		
 	}
