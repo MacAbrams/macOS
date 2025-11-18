@@ -1,0 +1,1 @@
+In progress personal project. This OS is written in C and assembly for x86 processors. It runs in 32 bit mode. currently it boots of a hand written BIOS bootloader which loads the whole OS at 0x1000 then the OS sets up virtual addressing and runs the kernel.
