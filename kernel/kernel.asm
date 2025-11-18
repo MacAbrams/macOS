@@ -11,24 +11,13 @@ _start:
 	mov esp, 0x9000
 	mov dword[esp], 10000011b ; identity page
 	add esp, 4
-	mov ecx, 768-1
+	mov dword[esp], (kernel_page_table) + 00000011b
+	add esp, 4
+	mov ecx, 1024-2
 	.l1:
 		mov dword[esp], 0
 		add esp, 4
 		loop .l1
-		mov dword[esp], (kernel_page_table) + 00000011b
-		add esp, 4
-		mov dword[esp], (1 << 22) | 10000011b
-		add esp, 4
-		mov dword[esp], (2 << 22) | 10000011b
-		add esp, 4
-		mov dword[esp], (3 << 22) | 10000011b
-		add esp, 4
-	mov ecx, 256-4
-	.l2:
-		mov dword[esp], 0
-		add esp, 4
-		loop .l2
 	; weve used 4096 bytes aka 0x1000 so we at 0xA000
 	kernel_page_table equ 0xA000
 	mov dword[esp], (1 << 12) | 00000000011b

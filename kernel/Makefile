@@ -21,6 +21,7 @@ timer.c.o \
 gdt.asm.o \
 idt.asm.o \
 keys.c.o \
+paging.c.o \
 
 .PHONY: all
 .SUFFIXES: .o .libk.o .c .S

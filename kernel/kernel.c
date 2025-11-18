@@ -7,6 +7,7 @@
 #include <timer.h>
 #include <keys.h>
 #include <mem.h>
+#include <paging.h>
 /*
  * current Memory
  * 0x00000
@@ -90,6 +91,7 @@ int main(uint32_t *memInfo){
 	initGdt();
 	initIdt();
 	initTimer();
+	initPaging();
 //	irq_install_handler(0,testFunc);
 	initKeys();
 
@@ -98,7 +100,7 @@ int main(uint32_t *memInfo){
 	printf("%x\n",num);
 	for(size_t i=0; i<(size_t)num;++i){
 		struct physical_memory_table_entry e = entries[i]; 
-		if(e.region ==1){
+		if(e.region == 1){
 			printf("%llx, %llx, %lx\n",e.base,e.length,e.region);
 		}
 		uint32_t start = e.base;
